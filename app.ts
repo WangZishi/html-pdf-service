@@ -10,6 +10,10 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url === '/health') {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ status: 'ok' }));
+    } else if (req.method === 'POST' && req.url === '/pdf') {
+        // console.log(req.)
+        req.on('data', (chunk: Buffer) => console.log(JSON.parse(chunk.toString())));
+        res.end();
     } else {
         res.statusCode = 404;
         res.end();
