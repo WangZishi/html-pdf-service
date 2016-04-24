@@ -1,0 +1,11 @@
+// 将设置放入此文件中以覆盖默认值和用户设置。
+{
+    // 启用后，将在保存文件时剪裁尾随空格。
+    "files.trimTrailingWhitespace": true,
+    // 启用字体连写
+    "editor.fontLigatures": true,
+    // 控制编辑器是否应呈现空白字符
+    "editor.renderWhitespace": true,
+    // 控制光标样式，接受的值为“块”和“行”
+    "editor.cursorStyle": "block"
+}

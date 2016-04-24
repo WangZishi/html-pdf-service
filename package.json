@@ -1,0 +1,26 @@
+{
+  "name": "html-pdf-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "install": "typings install",
+    "start": "node out/app.js",
+    "debug": "node --debug-brk --nolazy out/app.js",
+    "test": "ava",
+    "tsc": "tsc",
+    "typings": "typings"
+  },
+  "author": "Wang Zishi <ynh.2@outlook.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "ava": "^0.14.0",
+    "eslint": "^2.8.0",
+    "tslint": "^3.8.0",
+    "typings": "^0.8.1",
+    "typescript": "^1.8.10"
+  },
+  "dependencies": {
+    "html-pdf": "^2.0.1"
+  }
+}
