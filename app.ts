@@ -19,21 +19,24 @@ const server = http.createServer(async (req, res) => {
             let body: { html: string, options: any }, html: string, options: string;
             req.on('data', (chunk: Buffer) => {
                 body = JSON.parse(chunk.toString());
-                html = body.html;
+                html = body.html ||  '<h1>test</h1><table><tr><td>1</td><td>2</td></tr><tr><td>1</td><td>2</td></tr></table>';
                 options = body.html;
-                console.log({ html });
 
-                pdf.create(html).toStream((err, stream: NodeJS.ReadableStream) => {
-                    if (!!err) {
-                        console.log({ err });
-                        console.log({ stream });
-                        return;
-                    };
-                    let fileStream = fs.createWriteStream('test.pdf');
-                    stream.pipe(fileStream);
-                });
+                try {
+                    pdf.create(html).toStream((err, stream: NodeJS.ReadableStream) => {
+                        if (!!err) res.end(err);
+                        else {
+                            res.setHeader('Content-Type', 'application/pdf');
+                            res.setHeader('Content-Disposition', 'attachment;filename="render.pdf"');
+                            stream.pipe(res);
+                        }
+                    });
+                } catch (error) {
+                    res.statusCode = 500;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.end(JSON.stringify({ error: error.message }));
+                }
 
-                res.end();
             });
         }
     } else {
