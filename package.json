@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "install": "typings install",
-    "start": "node out/app.js",
+    "start": "pm2 start out/app.js",
     "debug": "node --debug-brk --nolazy out/app.js",
     "test": "ava",
     "tsc": "tsc",
@@ -21,6 +21,7 @@
     "typescript": "^1.8.10"
   },
   "dependencies": {
-    "html-pdf": "^2.0.1"
+    "html-pdf": "^2.0.1",
+    "pm2": "^1.1.3"
   }
 }

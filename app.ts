@@ -11,34 +11,35 @@ const server = http.createServer(async (req, res) => {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ status: 'ok' }));
     } else if (req.method === 'POST' && req.url === '/pdf') {
-        // console.log(req.)
-        req.on('data', (chunk: Buffer) => console.log(JSON.parse(chunk.toString())));
-        res.end();
+        if (req.headers['content-type'] !== 'application/json') {
+            res.statusCode = 415;
+            res.end();
+        } else {
+            // console.log(req.headers);
+            let body: { html: string, options: any }, html: string, options: string;
+            req.on('data', (chunk: Buffer) => {
+                body = JSON.parse(chunk.toString());
+                html = body.html;
+                options = body.html;
+                console.log({ html });
+
+                pdf.create(html).toStream((err, stream: NodeJS.ReadableStream) => {
+                    if (!!err) {
+                        console.log({ err });
+                        console.log({ stream });
+                        return;
+                    };
+                    let fileStream = fs.createWriteStream('test.pdf');
+                    stream.pipe(fileStream);
+                });
+
+                res.end();
+            });
+        }
     } else {
         res.statusCode = 404;
         res.end();
     }
-
-    // if (req.method === 'POST') console.log('POST!');
-
-    // if (req.url)
-    // console.log(req.url);
-
-    // res.end(req.url);
-
-    // let html = fs.readFileSync('./html/index.html', 'utf-8');
-
-    // pdf.create(html).toStream((err, stream: fs.ReadStream) => {
-    //     if (err)
-    //         console.error(err);
-    //     else {
-    //         let filename = encodeURIComponent('王子实.pdf');
-    //         res.writeHead(200, {
-    //             'Content-Disposition': `attachment;filename"${filename}";filename*=utf-8''${filename}`
-    //         });
-    //         stream.pipe(res);
-    //     }
-    // });
 });
 server.listen(3000);
 console.log('Listening on port 3000...');
