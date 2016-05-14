@@ -1,5 +1,3 @@
-'use strict';
-
 import * as http from 'http';
 import * as fs from 'fs';
 
@@ -15,11 +13,10 @@ const server = http.createServer(async (req, res) => {
             res.statusCode = 415;
             res.end();
         } else {
-            // console.log(req.headers);
             let body: { html: string, options: any }, html: string, options: string;
             req.on('data', (chunk: Buffer) => {
                 body = JSON.parse(chunk.toString());
-                html = body.html ||  '<h1>test</h1><table><tr><td>1</td><td>2</td></tr><tr><td>1</td><td>2</td></tr></table>';
+                html = body.html;
                 options = body.html;
 
                 try {
