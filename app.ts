@@ -22,7 +22,7 @@ const server = http.createServer(async (req, res) => {
                     body = decodeURIComponent(chunk.toString()).split('&').reduce((obj, value, index) => {
                         let values = value.split('='),
                             key = values.shift(),
-                            val = values.shift();
+                            val = decodeURIComponent(values.shift());
                         obj[key] = val;
                         return obj;
                     }, { html, options });
