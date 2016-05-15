@@ -2,6 +2,8 @@ import * as http from 'http';
 import * as fs from 'fs';
 
 const pdf = require('html-pdf');
+const formBody = require('body/form');
+const jsonBody = require('body/json');
 
 const server = http.createServer(async (req, res) => {
 
@@ -14,40 +16,35 @@ const server = http.createServer(async (req, res) => {
             res.statusCode = 415;
             res.end();
         } else {
-            let body: { html: string, options: any }, html: string, options: string;
-            req.on('data', (chunk: Buffer) => {
-                if (req.headers['content-type'] === 'application/json')
-                    body = JSON.parse(chunk.toString());
-                else
-                    body = decodeURIComponent(chunk.toString()).split('&').reduce((obj, value, index) => {
-                        let values = value.split('='),
-                            key = values.shift(),
-                            val = decodeURIComponent(values.shift());
-                        obj[key] = val;
-                        return obj;
-                    }, { html, options });
-
-                console.log({ body });
-                // body = JSON.parse(chunk.toString());
-                html = body.html;
-                options = body.options;
-
-                try {
-                    pdf.create(html).toStream((err, stream: NodeJS.ReadableStream) => {
-                        if (!!err) res.end(err);
-                        else {
-                            res.setHeader('Content-Type', 'application/pdf');
-                            res.setHeader('Content-Disposition', 'attachment;filename="render.pdf"');
-                            stream.pipe(res);
-                        }
-                    });
-                } catch (error) {
-                    res.statusCode = 500;
-                    res.setHeader('Content-Type', 'application/json');
-                    res.end(JSON.stringify({ error: error.message }));
-                }
-
-            });
+            let body: { html: string, options: any }, html: string, options: string,
+                generatePdf = (html, options, res) => {
+                    try {
+                        pdf.create(html).toStream((err, stream: NodeJS.ReadableStream) => {
+                            if (!!err) res.end(err);
+                            else {
+                                res.setHeader('Content-Type', 'application/pdf');
+                                res.setHeader('Content-Disposition', 'attachment;filename="render.pdf"');
+                                stream.pipe(res);
+                            }
+                        });
+                    } catch (error) {
+                        res.statusCode = 500;
+                        res.setHeader('Content-Type', 'application/json');
+                        res.end(JSON.stringify({ error: error.message }));
+                    }
+                };
+            if (req.headers['content-type'] === 'application/json')
+                jsonBody(req, res, (err, body) => {
+                    console.log({ jsonBody: body });
+                    generatePdf(body.html, body.options, res);
+                });
+            else {
+                formBody(req, res, (err, body) => {
+                    body.html = decodeURIComponent(body.html);
+                    console.log({ formBody: body });
+                    generatePdf(body.html, body.options, res);
+                });
+            }
         }
     } else {
         res.statusCode = 404;
