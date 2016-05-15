@@ -9,15 +9,28 @@ const server = http.createServer(async (req, res) => {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ status: 'ok' }));
     } else if (req.method === 'POST' && req.url === '/pdf') {
-        if (req.headers['content-type'] !== 'application/json') {
+        if (req.headers['content-type'] !== 'application/json' &&
+            req.headers['content-type'] !== 'application/x-www-form-urlencoded') {
             res.statusCode = 415;
             res.end();
         } else {
             let body: { html: string, options: any }, html: string, options: string;
             req.on('data', (chunk: Buffer) => {
-                body = JSON.parse(chunk.toString());
+                if (req.headers['content-type'] === 'application/json')
+                    body = JSON.parse(chunk.toString());
+                else
+                    body = decodeURIComponent(chunk.toString()).split('&').reduce((obj, value, index) => {
+                        let values = value.split('='),
+                            key = values.shift(),
+                            val = values.shift();
+                        obj[key] = val;
+                        return obj;
+                    }, { html, options });
+
+                console.log({ body });
+                // body = JSON.parse(chunk.toString());
                 html = body.html;
-                options = body.html;
+                options = body.options;
 
                 try {
                     pdf.create(html).toStream((err, stream: NodeJS.ReadableStream) => {

@@ -23,6 +23,7 @@
     "typescript": "^1.8.10"
   },
   "dependencies": {
+    "body": "^5.1.0",
     "html-pdf": "^2.0.1",
     "pm2": "^1.1.3"
   }
