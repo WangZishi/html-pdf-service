@@ -18,6 +18,7 @@ const server = http.createServer(async (req, res) => {
         } else {
             let body: { html: string, options: any }, html: string, options: string,
                 generatePdf = (html, options, res) => {
+                    let filename = options.filename || 'render';
                     try {
                         pdf.create(html, {
                             format: 'A4'
@@ -25,7 +26,7 @@ const server = http.createServer(async (req, res) => {
                             if (!!err) res.end(err);
                             else {
                                 res.setHeader('Content-Type', 'application/pdf');
-                                res.setHeader('Content-Disposition', 'attachment;filename="render.pdf"');
+                                res.setHeader('Content-Disposition', `attachment;filename="${filename}.pdf"`);
                                 stream.pipe(res);
                             }
                         });
@@ -150,7 +151,8 @@ const server = http.createServer(async (req, res) => {
                         .resultTable th{ background:#56627f; color:#fff; border:1px solid #000;}
 
                     </style>` + decodeURIComponent(body.html);
-                    console.log({ formBody: body });
+                    body.options = JSON.parse(body.options);
+                    console.log({ formOptions: body.options });
                     generatePdf(body.html, body.options, res);
                 });
             }
